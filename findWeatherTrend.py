@@ -7,7 +7,6 @@ WEATHER_URL = 'http://api.worldweatheronline.com/premium/v1/past-weather.ashx'
 # first covid19 data point is from Jan 22nd (which is 21 days after Jan 1's weather data)
 CODVID_DATA_START_DAY = 21 
 
-
 # this is what main is...
 def main():
   print('hello world')
