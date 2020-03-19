@@ -3,60 +3,68 @@ import requests
 import pickle
 
 '''
-States in australia:
-New South Wales
-Victoria
-Queensland
-South Australia
-From Diamond Princess
-Western Australia
-Tasmania
-Northern Territory
-Australian Capital Territory
+File: Find Weather Trend 
+------------------------
+This fle when run wil print out humidity and growth 
+rates of covid 19 deaths to predict how summer humidity 
+will effect spread of coronavirus.
 '''
 
+# Web address where we to weather data
 WEATHER_URL = 'http://api.worldweatheronline.com/premium/v1/past-weather.ashx'
-N_DAYS = 55
-# first covid19 data point is from Jan 22nd
+# first covid19 data point is from Jan 22nd (which is 21 days after Jan 1's weather data)
 CODVID_DATA_START_DAY = 21 
-
 
 # this is what main is...
 def main():
   print('hello world')
   
+  #weateher dict maps country name to the weather data in that country for each day
   weather_dict = load_weather_dict()
+
+  # confirmed dict is the confirmed cases of coronavirus in each country
   confirmed_dict = make_confirmed_dict()
 
+  #for loop over each country in weater dictionary 
   for country_name in weather_dict:
     # if country_name != 'United States': continue
 
+    #and look up and get the matching name in the  different dataset
     nickname = get_nick_name(country_name)
+
+    #if its not in the confirmed dictionary list then ignore the country and continue
     if not nickname in confirmed_dict: continue
 
+    #defining a variable called weather data that will get all the weather data for current country
     weather_data = weather_dict[country_name]
+    #create a variable of confirmed deaths for the current country 
     confirmed_data = confirmed_dict[nickname]
 
+    # for each day (counted using a day index) in confirmed data (except last)
     for day_index in range(len(confirmed_data) - 1):
       
-      # get growth rate for day
+      #current day is the confirmed deaths on day index
       curr_day = confirmed_data[day_index]
+      #next day is the confirmed deaths on the day after the index
       next_day = confirmed_data[day_index + 1]
+      #difference is the next day minus the current day (absolute growth in one day)
       diff = next_day - curr_day
 
+      #if the difference in absolute growth is greater than 5 and current day is not zero (add this last part so you never have to divide by zero)
       if diff >= 5 and curr_day != 0:
+        # get growth rate for day
         growth_rate = next_day / curr_day
-
-        # if growth_rate > 3.5: continue
         
-        # get weather for day
+        # Looking up the weather starting on the day covid19 deaths started, minus one week (as these were the conditions leading to death)
         weather_index = (CODVID_DATA_START_DAY + day_index) - 7
         # watch out for lookup up a date before jan 1st
         if weather_index < 0: continue
 
-        temp = float(weather_data[weather_index]['humidity'])
+        #get weather data for current country, look up the day, and the humidity and save it as humidity 
+        humidity = weather_data[weather_index]['humidity']
 
-        print(country_name+ "," + str(weather_index) + ','+str(temp)+ "," + str(growth_rate))
+        #print the country name, daynumber, humidty, and the growth rate  
+        print(country_name+ "," + str(weather_index) + ','+humidity+ "," + str(growth_rate))
     
 
 
@@ -71,22 +79,10 @@ def get_nick_name(country_name):
     country_name = 'Czechia'
 
   return country_name
-
-
-
-
-
-
-
-
-
-
-
-
   
 
 def make_confirmed_dict():
-  reader = csv.reader(open('Deaths3.csv'))
+  reader = csv.reader(open('Deaths.csv'))
   header = next(reader)
 
   n_days = len(header) - 4
@@ -108,35 +104,10 @@ def make_confirmed_dict():
       country_list = confirmed_map[country_name]
       country_list[i] += area_day_confirmed
 
-  # loop over a dictinoary (aka map)
-  # for country_name in confirmed_map:
-  #   country_list = confirmed_map[country_name]
-  #   print(country_name)
-  #   print(country_list)
-  #   print('')
-
   return confirmed_map
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def load_weather_dict():
-  return pickle.load(open('weather_map_full.pkl', 'rb'))
+  return pickle.load(open('weather_map.pkl', 'rb'))
 
 def make_weather_map():
   country_names = get_country_names()
@@ -147,7 +118,7 @@ def make_weather_map():
     weather = get_weather_for_location(country_name)
     weather_map[country_name] = weather
     print(weather)
-    pickle.dump(weather_map, open('weather_map_full.pkl', 'wb'))
+    pickle.dump(weather_map, open('weather_map.pkl', 'wb'))
 
 def get_country_names():
   reader = csv.reader(open('Confirmed.csv'))
