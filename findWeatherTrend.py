@@ -2,6 +2,14 @@ import csv
 import requests
 import pickle
 
+'''
+File: Find Weather Trend 
+------------------------
+This fle when run wil print out humidity and growth 
+rates of covid 19 deaths to predict how summer humidity 
+will effect spread of coronavirus.
+'''
+
 # Web address where we to weather data
 WEATHER_URL = 'http://api.worldweatheronline.com/premium/v1/past-weather.ashx'
 # first covid19 data point is from Jan 22nd (which is 21 days after Jan 1's weather data)
