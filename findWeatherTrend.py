@@ -4,8 +4,9 @@ import pickle
 
 '''
 File: Find Weather Trend 
+Author: Laura Mapstone + Chris Piech
 ------------------------
-This fle when run wil print out humidity and growth 
+This file when run will print out humidity and growth 
 rates of covid 19 deaths to predict how summer humidity 
 will effect spread of coronavirus.
 '''
